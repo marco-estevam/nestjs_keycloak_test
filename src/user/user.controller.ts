@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthenticatedUser, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 
 @Controller('user')
 export class UserController {
@@ -18,8 +19,9 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Roles({ roles: ['user'], mode: RoleMatchingMode.ALL })
+  findOne(@Param('id') id: string, @AuthenticatedUser() user: any) {
+    return this.userService.findOne(+id, user);
   }
 
   @Patch(':id')
